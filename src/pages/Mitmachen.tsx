@@ -523,16 +523,16 @@ function Rueckmeldung({ t, senden }: { t: Teilnahme; senden: (event: 'reaktion' 
     setGesperrt(true) // höchstens eine Reaktion pro Sekunde
     setTimeout(() => setGesperrt(false), 1000)
   }
-  const wahl = (aktiv: boolean) => `flex-1 rounded-xl py-2 text-base font-bold ${aktiv ? 'bg-funk-koralle text-funk-petrol-dark' : 'bg-white/10'}`
+  const wahl = (aktiv: boolean) => `min-w-0 flex-1 rounded-xl px-1 py-2 text-[clamp(0.8rem,4vw,1rem)] font-bold ${aktiv ? 'bg-funk-koralle text-funk-petrol-dark' : 'bg-white/10'}`
   return (
     <section className="shrink-0 rounded-2xl bg-funk-petrol-dark/70 p-2" aria-label="Rückmeldung">
       <div className="flex items-center justify-between gap-1">
         {REAKTIONEN.map((r) => (
-          <button key={r} type="button" onClick={() => reaktion(r)} aria-label={`Reaktion ${r}`} className="flex-1 rounded-xl py-1 text-3xl active:scale-90 disabled:opacity-40" disabled={gesperrt}>
+          <button key={r} type="button" onClick={() => reaktion(r)} aria-label={`Reaktion ${r}`} className="min-w-0 flex-1 rounded-xl py-1 text-[clamp(1.25rem,7vw,1.875rem)] active:scale-90 disabled:opacity-40" disabled={gesperrt}>
             {r}
           </button>
         ))}
-        <button type="button" onClick={() => setOffen((o) => !o)} aria-expanded={offen} className="rounded-xl bg-white/10 px-3 py-2 text-base font-bold">
+        <button type="button" onClick={() => setOffen((o) => !o)} aria-expanded={offen} className="shrink-0 rounded-xl bg-white/10 px-2.5 py-2 text-base font-bold">
           {offen ? '▾' : 'Tempo'}
         </button>
       </div>

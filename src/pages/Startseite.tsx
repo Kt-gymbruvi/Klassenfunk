@@ -6,7 +6,7 @@ export default function Startseite() {
     <main className="flex min-h-dvh flex-col items-center justify-center gap-12 px-6 py-10 text-center">
       <div className="flex flex-col items-center gap-3">
         <Logo gross />
-        <p className="text-2xl text-white/80">Abstimmen, Wortwolken, Fragen – live im Unterricht</p>
+        <p className="text-xl text-white/80 sm:text-2xl">Abstimmen, Wortwolken, Fragen – live im Unterricht</p>
       </div>
       <div className="flex w-full max-w-xl flex-col gap-4 sm:flex-row">
         <Link

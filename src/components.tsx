@@ -7,7 +7,7 @@ export function Logo({ gross = false }: { gross?: boolean }) {
   return (
     <h1
       className={`font-black tracking-tight text-funk-koralle drop-shadow-[0_4px_0_rgba(0,0,0,0.35)] ${
-        gross ? 'text-7xl sm:text-8xl lg:text-9xl' : 'text-4xl'
+        gross ? 'text-[clamp(2.75rem,14vw,8rem)] leading-tight' : 'text-4xl'
       }`}
     >
       Klassenfunk
