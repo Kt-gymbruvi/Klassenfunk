@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import { AuthProvider, useAuth } from './lib/auth.tsx'
+import { ZurHomepage } from './components.tsx'
 import Startseite from './pages/Startseite.tsx'
 import Mitmachen from './pages/Mitmachen.tsx'
 import Anmelden from './pages/lehrkraft/Anmelden.tsx'
@@ -14,7 +15,8 @@ export function NurAngemeldet({ children }: { children: ReactNode }) {
   const { session, laedt } = useAuth()
   if (laedt) {
     return (
-      <main className="flex min-h-dvh items-center justify-center">
+      <main className="relative flex min-h-dvh items-center justify-center">
+        <ZurHomepage ecke />
         <p className="text-2xl text-white/70">Einen Moment …</p>
       </main>
     )

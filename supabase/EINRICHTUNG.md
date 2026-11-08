@@ -9,6 +9,10 @@ Klassenfunk nutzt dieselbe Supabase-Datenbank und dieselben Lehrkraft-Konten wie
 
 Danach gibt es im **Table Editor** die Tabellen `kf_praesentationen`, `kf_folien`, `kf_sitzungen`, `kf_teilnehmer`, `kf_antworten`, `kf_fragen` und `kf_stimmen` – alle mit „RLS enabled“. Quizzo-Tabellen werden nicht verändert.
 
+## 1b. Bilder und Videos auf Info-Folien
+Genauso den Inhalt von [`migrations/kf_002_medien.sql`](migrations/kf_002_medien.sql) ausführen. Erwartet: „Success. No rows returned“.
+Danach gibt es unter **Storage** den Bucket `klassenfunk-medien` (öffentlich). Quizzo-Bilder werden nicht verändert.
+
 ## 2. Adresse erlauben (optional)
 **Authentication → URL Configuration → Redirect URLs** → Add URL: `https://kt-gymbruvi.github.io/Klassenfunk/`
 

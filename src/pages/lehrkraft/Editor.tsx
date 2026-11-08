@@ -3,7 +3,9 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Knopf, LehrkraftKopf } from '../../components.tsx'
 import { ladePraesentation, speicherePraesentation } from '../../lib/daten.ts'
 import { FOLIENTYPEN, GRENZEN, TYP_REIHENFOLGE, neueFolie, pruefePraesentation, wechsleTyp, type Folie, type FolienTyp } from '../../lib/folien.ts'
+import { raeumeBilderAuf } from '../../lib/medien.ts'
 import { fehlerText } from '../../lib/supabase.ts'
+import { MedienFeld } from './MedienFeld.tsx'
 
 const feld = 'w-full rounded-xl bg-white px-3 py-2 text-lg text-funk-petrol-dark placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-funk-koralle/60'
 const auswahlStil = 'rounded-xl bg-white px-3 py-2 text-lg font-semibold text-funk-petrol-dark'
@@ -43,6 +45,7 @@ export default function Editor() {
     setSpeichert(true)
     try {
       await speicherePraesentation(neu ? null : id!, titel, folien)
+      void raeumeBilderAuf()
       navigate('/leiten', { state: { hinweis: `„${titel.trim()}“ wurde gespeichert.` } })
     } catch (e) {
       setFehler([fehlerText(e)])
@@ -254,15 +257,25 @@ function FolienFelder({ f, nr, aendere }: { f: Folie; nr: number; aendere: (f: F
       return <p className="text-lg text-white/70">Die Klasse schickt anonym Fragen, andere geben 👍. Du siehst die meistgewünschten oben und kannst einzelne ausblenden.</p>
     case 'info':
       return (
-        <textarea
-          value={f.inhalt.text}
-          onChange={(e) => aendere({ ...f, inhalt: { text: e.target.value } })}
-          maxLength={GRENZEN.info}
-          rows={4}
-          placeholder="Text auf der Folie (optional)"
-          aria-label={`Folie ${nr} Text`}
-          className={feld}
-        />
+        <>
+          <textarea
+            value={f.inhalt.text}
+            onChange={(e) => aendere({ ...f, inhalt: { ...f.inhalt, text: e.target.value } })}
+            maxLength={GRENZEN.info}
+            rows={4}
+            placeholder="Text auf der Folie (optional)"
+            aria-label={`Folie ${nr} Text`}
+            className={feld}
+          />
+          <MedienFeld
+            medium={f.inhalt.medium}
+            setze={(m) => {
+              const { medium: _alt, ...rest } = f.inhalt
+              aendere({ ...f, inhalt: m ? { ...rest, medium: m } : rest })
+            }}
+            nr={nr}
+          />
+        </>
       )
   }
 }

@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom'
-import { Logo } from '../components.tsx'
+import { Logo, ZurHomepage } from '../components.tsx'
 
 export default function Startseite() {
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center gap-12 px-6 py-10 text-center">
+    <main className="relative flex min-h-dvh flex-col items-center justify-center gap-12 px-6 py-10 text-center">
+      <ZurHomepage ecke />
       <div className="flex flex-col items-center gap-3">
         <Logo gross />
         <p className="text-xl text-white/80 sm:text-2xl">Abstimmen, Wortwolken, Fragen – live im Unterricht</p>

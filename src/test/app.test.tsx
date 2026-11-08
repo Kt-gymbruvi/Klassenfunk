@@ -5,7 +5,7 @@ import App from '../App.tsx'
 import type { Folie } from '../lib/folien.ts'
 import { gruppiereWoerter } from '../ansicht/Ergebnis.tsx'
 import type { Ergebnisse, Zustand } from '../lib/daten.ts'
-import { abfrage, eingeloggteSession, fakeSupabase, setzeFakeZurueck } from './fakeSupabase.ts'
+import { SPEICHER_URL, abfrage, eingeloggteSession, fakeSpeicher, fakeSupabase, setzeFakeZurueck } from './fakeSupabase.ts'
 
 type Args = Record<string, unknown>
 const SITZUNG = '33333333-3333-4333-8333-333333333333'
@@ -301,5 +301,106 @@ describe('gruppiereWoerter', () => {
       ['Helix', 1],
     ])
     expect(g[0].ids).toEqual([1, 2])
+  })
+})
+
+describe('Info-Folie mit Bild oder YouTube-Video', () => {
+  beforeEach(() => setzeFakeZurueck(eingeloggteSession()))
+
+  it('Editor: YouTube-Link (mit Startzeit) übernehmen und speichern', async () => {
+    const user = userEvent.setup()
+    rpcAntworten({ kf_praesentation_speichern: 'p1' })
+    zeige('/leiten/praesentation/neu')
+    await user.type(await screen.findByPlaceholderText(/Einstieg Evolution/), 'Film')
+    await user.selectOptions(screen.getByLabelText('Typ Folie 1'), 'info')
+    await user.type(screen.getByLabelText('Text Folie 1'), 'Schaut genau hin')
+    await user.type(screen.getByLabelText('Folie 1 YouTube-Link'), 'kein Link')
+    await user.click(screen.getByRole('button', { name: 'Übernehmen' }))
+    expect(await screen.findByText(/kein YouTube-Link/)).toBeInTheDocument()
+    await user.clear(screen.getByLabelText('Folie 1 YouTube-Link'))
+    await user.type(screen.getByLabelText('Folie 1 YouTube-Link'), 'https://youtu.be/dQw4w9WgXcQ?t=83')
+    await user.click(screen.getByRole('button', { name: 'Übernehmen' }))
+    expect(screen.getByLabelText('Folie 1 Startzeit')).toHaveValue('1:23')
+    await user.click(screen.getByRole('button', { name: 'Speichern' }))
+    await waitFor(() => expect(aufrufe('kf_praesentation_speichern')).toHaveLength(1))
+    expect(aufrufe('kf_praesentation_speichern')[0].p_folien).toEqual([
+      { typ: 'info', text: 'Schaut genau hin', inhalt: { text: '', medium: { art: 'youtube', id: 'dQw4w9WgXcQ', start: 83 } } },
+    ])
+  })
+
+  it('Editor: Bild hochladen (eigener Ordner im Klassenfunk-Speicher) und wieder entfernen', async () => {
+    const user = userEvent.setup()
+    rpcAntworten({ kf_praesentation_speichern: 'p1' })
+    zeige('/leiten/praesentation/neu')
+    await user.type(await screen.findByPlaceholderText(/Einstieg Evolution/), 'Zelle')
+    await user.selectOptions(screen.getByLabelText('Typ Folie 1'), 'info')
+    await user.type(screen.getByLabelText('Text Folie 1'), 'Die Zelle')
+    await user.upload(screen.getByLabelText('Folie 1 Bild auswählen'), new File(['x'], 'zelle.png', { type: 'image/png' }))
+    expect(await screen.findByAltText('Bild auf Folie 1')).toBeInTheDocument()
+    expect(fakeSupabase.storage.from).toHaveBeenCalledWith('klassenfunk-medien')
+    const pfad = fakeSpeicher.upload.mock.calls[0][0] as string
+    expect(pfad).toMatch(/^u1\/[0-9a-f-]{36}\.png$/)
+    await user.click(screen.getByRole('button', { name: 'Speichern' }))
+    await waitFor(() => expect(aufrufe('kf_praesentation_speichern')).toHaveLength(1))
+    expect((aufrufe('kf_praesentation_speichern')[0].p_folien as Folie[])[0].inhalt).toEqual({ text: '', medium: { art: 'bild', url: SPEICHER_URL + pfad, pfad } })
+  })
+
+  it('Editor: falsches Dateiformat wird abgelehnt', async () => {
+    const user = userEvent.setup({ applyAccept: false })
+    zeige('/leiten/praesentation/neu')
+    await user.selectOptions(await screen.findByLabelText('Typ Folie 1'), 'info')
+    await user.upload(screen.getByLabelText('Folie 1 Bild auswählen'), new File(['x'], 'text.pdf', { type: 'application/pdf' }))
+    expect(await screen.findByText(/Dateiformat geht leider nicht/)).toBeInTheDocument()
+    expect(fakeSpeicher.upload).not.toHaveBeenCalled()
+  })
+
+  const beamer = (folie: Folie): Ergebnisse => ({
+    id: SITZUNG, pin: '123456', titel: 'Einstieg', folie_nr: 0, anzahl_folien: 1, folie,
+    abstimmung_offen: true, ergebnisse_sichtbar: true, teilnehmer: 0, abgestimmt: 0, antworten: [], fragen: [],
+  })
+
+  it('Beamer zeigt Bild bzw. YouTube-Video (ohne Cookies, mit Startzeit)', async () => {
+    const user = userEvent.setup()
+    rpcAntworten({ kf_ergebnisse: beamer({ typ: 'info', text: 'Die Zelle', inhalt: { text: 'Beschriftet', medium: { art: 'bild', url: 'https://bild.test/zelle.webp' } } }) })
+    const { container, unmount } = zeige(`/leiten/sitzung/${SITZUNG}`)
+    await user.click(await screen.findByRole('button', { name: 'Los geht’s' }))
+    expect(container.querySelector('img[src="https://bild.test/zelle.webp"]')).not.toBeNull()
+    expect(screen.getByText('Beschriftet')).toBeInTheDocument()
+    unmount()
+
+    rpcAntworten({ kf_ergebnisse: beamer({ typ: 'info', text: 'Film', inhalt: { text: '', medium: { art: 'youtube', id: 'dQw4w9WgXcQ', start: 83 } } }) })
+    zeige(`/leiten/sitzung/${SITZUNG}`)
+    await user.click(await screen.findByRole('button', { name: 'Los geht’s' }))
+    expect(screen.getByTitle('YouTube-Video')).toHaveAttribute('src', 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0&playsinline=1&start=83')
+  })
+
+  it('Handy zeigt kein Bild und kein Video – nur „Schau nach vorne“', async () => {
+    localStorage.setItem('klassenfunk-teilnahme', JSON.stringify({ ...T, gemerkt: Date.now() }))
+    rpcAntworten({ kf_zustand: zustand({ typ: 'info', text: 'Film', inhalt: { text: '', medium: { art: 'youtube', id: 'dQw4w9WgXcQ' } } }) })
+    const { container } = zeige('/mitmachen')
+    expect(await screen.findByText('Schau nach vorne!')).toBeInTheDocument()
+    expect(container.querySelector('iframe, img')).toBeNull()
+  })
+})
+
+describe('Link zur Homepage', () => {
+  it('steht in jeder Ansicht', async () => {
+    const pruefe = async (pfad: string, session: unknown, warteAuf: RegExp) => {
+      setzeFakeZurueck(session)
+      rpcAntworten({ kf_zustand: zustand({ typ: 'info', text: 'Hallo', inhalt: { text: '' } }), kf_ergebnisse: null })
+      const { unmount } = zeige(pfad)
+      await screen.findAllByText(warteAuf)
+      expect(screen.getByRole('link', { name: 'Zur Homepage' })).toHaveAttribute('href', 'https://kt-gymbruvi.github.io/')
+      unmount()
+      localStorage.clear()
+    }
+    await pruefe('/', null, /Präsentieren/)
+    await pruefe('/mitmachen', null, /PIN vom Beamer/)
+    await pruefe('/leiten', null, /Anmelden/)
+    await pruefe('/leiten', eingeloggteSession(), /Meine Präsentationen|Neue Präsentation/)
+    await pruefe('/leiten/praesentation/neu', eingeloggteSession(), /Folie hinzufügen/)
+    await pruefe(`/leiten/sitzung/${SITZUNG}`, eingeloggteSession(), /gibt es nicht mehr/)
+    localStorage.setItem('klassenfunk-teilnahme', JSON.stringify({ ...T, gemerkt: Date.now() }))
+    await pruefe('/mitmachen', null, /Schau nach vorne/)
   })
 })

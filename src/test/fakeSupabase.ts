@@ -20,9 +20,9 @@ export const fakeSupabase = {
   storage: { from: fn() },
 }
 
-/** Attrappe des Dateispeichers (Supabase Storage, Bucket "quizzo-medien" (in Klassenfunk nicht genutzt)) */
+/** Attrappe des Dateispeichers (Supabase Storage, Bucket "klassenfunk-medien") */
 export const fakeSpeicher = { upload: fn(), getPublicUrl: fn(), list: fn(), remove: fn() }
-export const SPEICHER_URL = 'https://test.supabase.co/storage/v1/object/public/quizzo-medien/'
+export const SPEICHER_URL = 'https://test.supabase.co/storage/v1/object/public/klassenfunk-medien/'
 
 export function eingeloggteSession(email = 'lehrkraft@schule.test') {
   return { access_token: 'x', user: { id: 'u1', email } }

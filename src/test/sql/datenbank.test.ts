@@ -154,4 +154,53 @@ describe('Klassenfunk-Datenbank', () => {
       await expect(rpc(db, ANONYM, 'kf_beitreten', [alt.pin])).rejects.toThrow('läuft gerade nichts')
     })
   })
+
+  describe('Info-Folie mit Bild oder YouTube-Video (kf_002)', () => {
+    const info = (medium: unknown) => [{ typ: 'info', text: 'Schau mal', inhalt: { text: '', medium } }]
+    const BILD_PFAD = `${LEHRKRAFT_A}/11111111-2222-4333-8444-555555555555.webp`
+
+    it('gültige Medien werden gespeichert', async () => {
+      for (const m of [
+        { art: 'bild', url: `https://x.supabase.co/storage/v1/object/public/klassenfunk-medien/${BILD_PFAD}`, pfad: BILD_PFAD },
+        { art: 'bild', url: 'https://example.org/zelle.png' },
+        { art: 'youtube', id: 'dQw4w9WgXcQ' },
+        { art: 'youtube', id: 'dQw4w9WgXcQ', start: 83 },
+      ]) {
+        const id = await rpc<string>(db, A, 'kf_praesentation_speichern', [null, 'Mit Medium', json(info(m))])
+        const [{ inhalt }] = await als<{ inhalt: { medium: unknown } }>(db, A, 'select inhalt from public.kf_folien where praesentation_id = $1', [id])
+        expect(inhalt.medium).toEqual(m)
+      }
+    })
+
+    it('ungültige Medien lehnt die Datenbank ab', async () => {
+      for (const m of [
+        { art: 'bild', url: 'http://unsicher.de/bild.png' },
+        { art: 'bild', url: 'javascript:alert(1)' },
+        { art: 'bild', url: 'https://ok.de/a.png', pfad: '../fremd/datei.png' },
+        { art: 'youtube', id: 'zu-kurz' },
+        { art: 'youtube', id: 'dQw4w9WgXcQ', start: -5 },
+        { art: 'youtube', id: 'dQw4w9WgXcQ', start: '10' },
+        { art: 'youtube', id: 'dQw4w9WgXcQ', extra: 1, start: 1 },
+        { art: 'video', url: 'https://ok.de/a.mp4' },
+        'https://ok.de/a.png',
+      ]) {
+        await expect(rpc(db, A, 'kf_praesentation_speichern', [null, 'Kaputt', json(info(m))])).rejects.toThrow(/check/)
+      }
+      // Medium nur auf Info-Folien: bei anderen Typen bleibt alles wie bisher
+      expect(await rpc(db, A, 'kf_praesentation_speichern', [null, 'Ohne', json([{ typ: 'info', text: 'x', inhalt: { text: 'y' } }])])).toBeTruthy()
+    })
+
+    it('Bilder-Speicher: jede Lehrkraft nur im eigenen Ordner, Schüler gar nicht', async () => {
+      const [bucket] = await db.query<{ public: boolean; allowed_mime_types: string[] }>("select public, allowed_mime_types from storage.buckets where id = 'klassenfunk-medien'").then((r) => r.rows)
+      expect(bucket.public).toBe(true)
+      expect(bucket.allowed_mime_types).toEqual(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+      const lege = (wer: typeof A, name: string) => als(db, wer, "insert into storage.objects (bucket_id, name) values ('klassenfunk-medien', $1)", [name])
+      await lege(A, BILD_PFAD)
+      await expect(lege(B, BILD_PFAD.replace('5555', '6666'))).rejects.toThrow(/row-level security/)
+      await expect(lege(ANONYM, `${LEHRKRAFT_A}/x.png`)).rejects.toThrow(/row-level security|permission denied/)
+      expect(await als(db, B, "select name from storage.objects where bucket_id = 'klassenfunk-medien'")).toEqual([])
+      expect(await als(db, B, 'delete from storage.objects returning name')).toEqual([])
+      expect(await als(db, A, "delete from storage.objects where bucket_id = 'klassenfunk-medien' returning name")).toEqual([{ name: BILD_PFAD }])
+    })
+  })
 })

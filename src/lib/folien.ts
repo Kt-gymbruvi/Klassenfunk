@@ -9,8 +9,11 @@ export type Inhalte = {
   punkte: { optionen: string[] }
   raster: { elemente: string[]; x: [string, string]; y: [string, string] }
   fragen: Record<string, never>
-  info: { text: string }
+  info: { text: string; medium?: Medium }
 }
+
+/** Bild (hochgeladen oder https-Adresse) oder YouTube-Video auf der Info-Folie – nur am Beamer zu sehen. */
+export type Medium = { art: 'bild'; url: string; pfad?: string } | { art: 'youtube'; id: string; start?: number }
 export type FolienTyp = keyof Inhalte
 export type Folie = { [T in FolienTyp]: { typ: T; text: string; inhalt: Inhalte[T] } }[FolienTyp]
 
@@ -24,7 +27,7 @@ export const FOLIENTYPEN: Record<FolienTyp, TypInfo> = {
   punkte: { name: '100 Punkte', symbol: '💯', beschreibung: '100 Punkte auf Möglichkeiten verteilen' },
   raster: { name: '2×2-Raster', symbol: '▦', beschreibung: 'Begriffe auf zwei Achsen einordnen' },
   fragen: { name: 'Fragen der Klasse', symbol: '🙋', beschreibung: 'Schüler stellen Fragen, andere stimmen zu' },
-  info: { name: 'Info-Folie', symbol: '▭', beschreibung: 'Text zeigen, ohne Abstimmung' },
+  info: { name: 'Info-Folie', symbol: '▭', beschreibung: 'Text, Bild oder YouTube-Video zeigen, ohne Abstimmung' },
 }
 export const TYP_REIHENFOLGE: FolienTyp[] = ['wortwolke', 'auswahl', 'offen', 'skala', 'rangfolge', 'punkte', 'raster', 'fragen', 'info']
 
@@ -81,7 +84,7 @@ export function bereinigeFolie(f: Folie): Folie {
         inhalt: { elemente: f.inhalt.elemente.map(t).filter(Boolean), x: [t(f.inhalt.x[0]), t(f.inhalt.x[1])], y: [t(f.inhalt.y[0]), t(f.inhalt.y[1])] },
       }
     case 'info':
-      return { typ: 'info', text, inhalt: { text: f.inhalt.text.trim() } }
+      return { typ: 'info', text, inhalt: { text: f.inhalt.text.trim(), ...(f.inhalt.medium ? { medium: f.inhalt.medium } : {}) } }
     default:
       return { ...f, text } as Folie
   }
@@ -119,4 +122,33 @@ export function pruefePraesentation(titel: string, folien: Folie[]): string[] {
     }
   })
   return p
+}
+
+/** YouTube-Video-ID aus einem Link (watch?v=, youtu.be/, shorts/, embed/, live/) oder einer nackten ID. */
+export function youtubeId(text: string): string | null {
+  const s = text.trim()
+  if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s
+  const m = s.match(/(?:youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/)
+  return m ? m[1] : null
+}
+
+/** Startzeit aus einem YouTube-Link (?t=83, &t=1m23s, ?start=83) in Sekunden, sonst undefined. */
+export function youtubeStart(text: string): number | undefined {
+  const m = text.match(/[?&#](?:t|start)=(?:(\d+)h)?(?:(\d+)m)?(\d+)?s?(?:&|$)/)
+  if (!m || (!m[1] && !m[2] && !m[3])) return undefined
+  const s = Number(m[1] ?? 0) * 3600 + Number(m[2] ?? 0) * 60 + Number(m[3] ?? 0)
+  return s > 0 && s <= 36000 ? s : undefined
+}
+
+/** Sekunden als m:ss */
+export function zeitText(s: number): string {
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
+}
+
+/** Liest „1:23“ oder „83“ als Sekunden. Leer → undefined, unlesbar → NaN. */
+export function leseZeit(text: string): number | undefined {
+  const s = text.trim()
+  if (!s) return undefined
+  if (!/^\d+(:\d{1,2}){0,2}$/.test(s)) return NaN
+  return s.split(':').reduce((summe, teil) => summe * 60 + Number(teil), 0)
 }

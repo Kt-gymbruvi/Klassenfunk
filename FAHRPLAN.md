@@ -1,6 +1,6 @@
 # Klassenfunk – Fahrplan
 
-## Etappe A – Live-Abstimmung ✅ (gebaut, noch nicht veröffentlicht)
+## Etappe A – Live-Abstimmung ✅
 - Präsentationen mit Folien anlegen, kopieren, löschen (eigener Editor).
 - Sitzung starten: PIN + QR-Code am Beamer, Schüler anonym per Handy.
 - Folientypen: Wortwolke (1–3 Begriffe pro Person), Umfrage (Einfach-/Mehrfachauswahl), Offene Frage (bis 3 Antworten), Info-Folie.
@@ -21,10 +21,15 @@
 - Tempo-Barometer (zu langsam / passt / zu schnell) und Verständnis (nein / teils / ja), letzte 3 Minuten, in der Kopfzeile am Beamer.
 - Nur Echtzeit-Nachrichten, nichts gespeichert.
 
+## Etappe E – Bilder und Videos, Homepage-Knopf ✅ (SQL kf_002 nötig)
+- Info-Folie: Bild hochladen (wird auf höchstens 1920 px verkleinert) oder YouTube-Link einfügen (Startzeit aus dem Link oder von Hand).
+- Bild/Video nur am Beamer, Handys zeigen „Schau nach vorne“.
+- Knopf „🏠 Homepage“ in jeder Ansicht oben links.
+
 ## Vor dem Veröffentlichen
 1. SQL `supabase/migrations/kf_001_klassenfunk.sql` im Supabase SQL Editor ausführen.
 2. Leeres öffentliches GitHub-Repository `Klassenfunk` anlegen; Pages-Quelle „GitHub Actions“.
 3. Push nach Zustimmung; Kachel auf der Startseite kt-gymbruvi.github.io ergänzen.
 
 ## Ideen für später
-- Bilder auf Folien, Quiz-Folie mit richtiger Antwort, Ergebnisse als PDF/Bild exportieren, Präsentation per Link teilen.
+- Bilder auch auf Abstimmungsfolien, Quiz-Folie mit richtiger Antwort, Ergebnisse als PDF/Bild exportieren, Präsentation per Link teilen.

@@ -15,6 +15,26 @@ export function Logo({ gross = false }: { gross?: boolean }) {
   )
 }
 
+/** Adresse der Homepage (Startseite mit allen Lernangeboten) */
+export const HOMEPAGE = 'https://kt-gymbruvi.github.io/'
+
+/** Kleiner Knopf zur Homepage – steht in jeder Ansicht oben links in der Ecke. */
+export function ZurHomepage({ ecke = false }: { ecke?: boolean }) {
+  return (
+    <a
+      href={HOMEPAGE}
+      title="Zur Homepage – Lernen mit Spaß"
+      aria-label="Zur Homepage"
+      className={`inline-flex shrink-0 items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1.5 text-base font-semibold text-white/85 ring-1 ring-white/15 hover:bg-white/20 hover:text-white ${
+        ecke ? 'absolute top-3 left-3 z-20' : ''
+      }`}
+    >
+      <span aria-hidden="true">🏠</span>
+      <span className="hidden sm:inline">Homepage</span>
+    </a>
+  )
+}
+
 export function ZurueckLink({ zu = '/', text = '← Startseite' }: { zu?: string; text?: string }) {
   return (
     <Link to={zu} className="text-lg text-white/80 underline-offset-4 hover:text-funk-koralle hover:underline">
@@ -71,6 +91,7 @@ export function LehrkraftKopf({ links }: { links?: ReactNode }) {
   return (
     <header className="flex flex-wrap items-center justify-between gap-4">
       <div className="flex items-center gap-6">
+        <ZurHomepage />
         <Link to="/" aria-label="Zur Startseite">
           <Logo />
         </Link>

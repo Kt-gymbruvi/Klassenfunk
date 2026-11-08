@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Knopf, Logo, Meldung, ZurueckLink } from '../components.tsx'
+import { Knopf, Logo, Meldung, ZurHomepage, ZurueckLink } from '../components.tsx'
 import { Einpassen } from '../einpassen.tsx'
 import {
   REAKTIONEN,
@@ -70,8 +70,11 @@ function Beitreten({ fertig }: { fertig: (t: Teilnahme) => void }) {
   }
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-8 px-5 py-6">
-      <header className="flex items-center justify-between">
-        <Logo />
+      <header className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <ZurHomepage />
+          <Logo />
+        </div>
         <ZurueckLink />
       </header>
       <form onSubmit={absenden} className="flex flex-1 flex-col justify-center gap-5">
@@ -203,7 +206,10 @@ function Sitzung({ t, verlassen }: { t: Teilnahme; verlassen: () => void }) {
   return (
     <main className="mx-auto flex h-dvh max-w-md flex-col gap-3 overflow-hidden px-4 py-3">
       <header className="flex shrink-0 items-center justify-between gap-3">
-        <span className="text-2xl font-black text-funk-koralle">Klassenfunk</span>
+        <div className="flex shrink-0 items-center gap-2">
+          <ZurHomepage />
+          <span className="text-2xl font-black text-funk-koralle">Klassenfunk</span>
+        </div>
         <span className="truncate text-base text-white/60">{z?.titel}</span>
       </header>
       <Einpassen key={`${z?.folie_nr}-${bearbeiten}`} minimum={0.6}>

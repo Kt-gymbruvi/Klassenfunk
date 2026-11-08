@@ -246,7 +246,30 @@ export function Ergebnis({
         </ul>
       )
     }
-    case 'info':
-      return folie.inhalt.text ? <p className="flex-1 rounded-3xl bg-white/5 px-10 py-8 text-4xl leading-snug whitespace-pre-line">{folie.inhalt.text}</p> : <div className="flex-1" />
+    case 'info': {
+      const { text, medium } = folie.inhalt
+      if (!medium) return text ? <p className="flex-1 rounded-3xl bg-white/5 px-10 py-8 text-4xl leading-snug whitespace-pre-line">{text}</p> : <div className="flex-1" />
+      return (
+        <div className="flex flex-1 gap-6">
+          {text && <p className="max-w-[40%] shrink-0 self-start rounded-3xl bg-white/5 px-8 py-6 text-3xl leading-snug whitespace-pre-line">{text}</p>}
+          {/* Das Medium füllt den restlichen Platz, ohne die Höhe zu bestimmen (sonst würde alles verkleinert) */}
+          <div className="relative min-h-[45vh] flex-1">
+            {medium.art === 'bild' ? (
+              <img src={medium.url} alt="" className="absolute inset-0 h-full w-full object-contain" />
+            ) : (
+              <iframe
+                // youtube-nocookie: YouTube setzt erst beim Abspielen Cookies (nur auf dem Lehrkraft-Gerät)
+                src={`https://www.youtube-nocookie.com/embed/${medium.id}?${new URLSearchParams({ rel: '0', playsinline: '1', ...(medium.start ? { start: String(medium.start) } : {}) })}`}
+                title="YouTube-Video"
+                allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                allowFullScreen
+                referrerPolicy="strict-origin-when-cross-origin"
+                className="absolute inset-0 h-full w-full rounded-3xl bg-black"
+              />
+            )}
+          </div>
+        </div>
+      )
+    }
   }
 }

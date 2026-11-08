@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import QRCode from 'qrcode'
-import { Knopf, Meldung } from '../../components.tsx'
+import { Knopf, Meldung, ZurHomepage } from '../../components.tsx'
 import { Einpassen } from '../../einpassen.tsx'
 import { Ergebnis } from '../../ansicht/Ergebnis.tsx'
 import {
@@ -107,7 +107,8 @@ export default function Praesentieren() {
   return (
     <main className="relative flex h-dvh flex-col gap-3 overflow-hidden px-6 py-4 lg:px-10">
       <header className="flex shrink-0 flex-wrap items-center justify-between gap-3">
-        <div className="flex items-baseline gap-4">
+        <div className="flex items-center gap-4">
+          <ZurHomepage />
           <span className="text-3xl font-black text-funk-koralle">Klassenfunk</span>
           <span className="text-xl text-white/70">{e.titel}</span>
         </div>
@@ -212,7 +213,12 @@ export default function Praesentieren() {
 }
 
 function Mitte({ children }: { children: React.ReactNode }) {
-  return <main className="flex min-h-dvh flex-col items-center justify-center gap-6 px-8 text-center">{children}</main>
+  return (
+    <main className="relative flex min-h-dvh flex-col items-center justify-center gap-6 px-8 text-center">
+      <ZurHomepage ecke />
+      {children}
+    </main>
+  )
 }
 
 function Beitreten({ pin, teilnehmer, weiter }: { pin: string; teilnehmer: number; weiter: () => void }) {

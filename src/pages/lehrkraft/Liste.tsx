@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Knopf, LehrkraftKopf, Meldung } from '../../components.tsx'
 import { ladePraesentation, ladePraesentationen, loeschePraesentation, speicherePraesentation, starteSitzung, type PraesentationKurz } from '../../lib/daten.ts'
+import { raeumeBilderAuf } from '../../lib/medien.ts'
 import { fehlerText } from '../../lib/supabase.ts'
 
 const datum = new Intl.DateTimeFormat('de-DE', { day: 'numeric', month: 'short', year: 'numeric' })
@@ -48,6 +49,7 @@ export default function Liste() {
     if (!window.confirm(`Präsentation „${p.titel}“ wirklich löschen? Das kann nicht rückgängig gemacht werden.`)) return
     try {
       await loeschePraesentation(p.id)
+      void raeumeBilderAuf()
       laden()
     } catch (e) {
       setFehler(fehlerText(e))
