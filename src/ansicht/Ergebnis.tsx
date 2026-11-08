@@ -250,10 +250,11 @@ export function Ergebnis({
       const { text, medium } = folie.inhalt
       if (!medium) return text ? <p className="flex-1 rounded-3xl bg-white/5 px-10 py-8 text-4xl leading-snug whitespace-pre-line">{text}</p> : <div className="flex-1" />
       return (
-        <div className="flex flex-1 gap-6">
-          {text && <p className="max-w-[40%] shrink-0 self-start rounded-3xl bg-white/5 px-8 py-6 text-3xl leading-snug whitespace-pre-line">{text}</p>}
-          {/* Das Medium füllt den restlichen Platz, ohne die Höhe zu bestimmen (sonst würde alles verkleinert) */}
-          <div className="relative min-h-[45vh] flex-1">
+        // Mit Text: zwei genau gleich große Hälften (Text links, Medium rechts), ohne Text füllt das Medium alles
+        <div className={`flex-1 gap-6 ${text ? 'grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)]' : 'flex'}`}>
+          {text && <p className="rounded-3xl bg-white/5 px-10 py-8 text-4xl leading-snug break-words whitespace-pre-line">{text}</p>}
+          {/* Das Medium füllt seinen Platz, ohne die Höhe zu bestimmen (sonst würde alles verkleinert) */}
+          <div className="relative min-h-[45vh] min-w-0 flex-1" data-testid="medium">
             {medium.art === 'bild' ? (
               <img src={medium.url} alt="" className="absolute inset-0 h-full w-full object-contain" />
             ) : (
