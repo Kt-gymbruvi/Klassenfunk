@@ -1,9 +1,12 @@
 # Klassenfunk – Projektregeln
 
-Klassenfunk ist eine Live-Abstimmungs-App für den Schulunterricht (Wortwolke, Umfrage, Skala, Fragen der Klasse …) – eigener Name, eigenes Design. Schwesterprojekt von Quizzo (`../Quizzo`), aber eine eigene Anwendung.
+Klassenfunk ist eine Live-Abstimmungs-App für den Schulunterricht (Wortwolke, Umfrage, Skala, Fragen der Klasse …) – eigener Name, eigenes Design. Schwesterprojekt von Quizzo (`../Quizzo`), aber eine eigene Anwendung. Die Lehrkraft legt Präsentationen mit Folien an und zeigt sie am Beamer; Schüler machen anonym per Handy mit PIN mit.
+
+**Projektgedächtnis:** Stand, offene Aufgaben und nächste Schritte in `docs/PROJECT-STATUS.md`, Architekturentscheidungen in `docs/DECISIONS.md`, Etappen in `FAHRPLAN.md`. Nach größeren Funktionen oder Entscheidungen diese Dateien aktualisieren (knapp, nur Tatsächliches).
 
 ## Technik
-- Statische Web-App: Vite + React + TypeScript + Tailwind CSS v4.
+- Statische Web-App: Vite 8 + React 19 + TypeScript + Tailwind CSS v4, React Router (HashRouter), `@supabase/supabase-js` v2, `qrcode`. Tests: Vitest + Testing Library, PGlite.
+- Code: `src/pages/` (Startseite, Mitmachen = Handy), `src/pages/lehrkraft/` (Anmelden, Liste, Editor, MedienFeld, Praesentieren = Beamer, Passwort), `src/ansicht/Ergebnis.tsx` (Ergebnisse je Folientyp), `src/lib/` (`daten.ts` Datenzugriff/Echtzeit, `folien.ts` Folienformat, `medien.ts`, `auth.tsx`, `supabase.ts`).
 - Hosting: GitHub Pages unter https://kt-gymbruvi.github.io/Klassenfunk/ (Basis-Pfad `/Klassenfunk/`).
 - Deployment automatisch per GitHub Actions (`.github/workflows/deploy.yml`) bei Push auf `main`.
 - Daten, Lehrkraft-Login und Echtzeit über dieselbe Supabase-Datenbank wie Quizzo (Region Frankfurt). Alle Klassenfunk-Tabellen und -Funktionen beginnen mit `kf_`. Kein eigener Server.
@@ -40,6 +43,11 @@ Klassenfunk ist eine Live-Abstimmungs-App für den Schulunterricht (Wortwolke, U
 - Im Code steht nur der öffentliche Supabase-Schlüssel (publishable / anon).
 - Niemals den secret- oder service_role-Schlüssel verwenden – weder im Code, noch in Workflows, noch in `.env`-Dateien.
 - Alle Tabellen haben Row Level Security (RLS) aktiviert, mit expliziten Policies.
+
+## Konventionen
+- Bezeichner, Kommentare, Commit-Nachrichten auf Deutsch; Etappen mit Buchstaben (A, B, …).
+- Neuer Folientyp: `src/lib/folien.ts` (Typ, Bereinigung, Prüfung), SQL `kf_folie_gueltig` (neue Migration), Editor, Ergebnis, Handy-Eingabe, Tests.
+- Muster aus Quizzo übernehmen (Einpassen, fakeSupabase, PGlite-Nachbau), aber keinen Code zwischen den Repos teilen.
 
 ## Arbeitsweise
 - Nach jeder Etappe: Tests ausführen (`npm test`, `npm run build` – enthält die TypeScript-Prüfung) und zusammenfassen, was getestet wurde und was nicht.
