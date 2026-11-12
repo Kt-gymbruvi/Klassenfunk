@@ -15,7 +15,7 @@ export function Logo({ gross = false }: { gross?: boolean }) {
   )
 }
 
-/** Adresse der Homepage (Startseite mit allen Lernangeboten) */
+/** Adresse der Homepage (Startseite der Plattform „Lehrraum“) */
 export const HOMEPAGE = 'https://kt-gymbruvi.github.io/'
 
 /** Kleiner Knopf zur Homepage – steht in jeder Ansicht oben links in der Ecke. */
@@ -23,14 +23,14 @@ export function ZurHomepage({ ecke = false }: { ecke?: boolean }) {
   return (
     <a
       href={HOMEPAGE}
-      title="Zur Homepage – Lernen mit Spaß"
+      title="Zur Startseite Lehrraum"
       aria-label="Zur Homepage"
       className={`inline-flex shrink-0 items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1.5 text-base font-semibold text-white/85 ring-1 ring-white/15 hover:bg-white/20 hover:text-white ${
         ecke ? 'absolute top-3 left-3 z-20' : ''
       }`}
     >
       <span aria-hidden="true">🏠</span>
-      <span className="hidden sm:inline">Homepage</span>
+      <span className="hidden sm:inline">Lehrraum</span>
     </a>
   )
 }
