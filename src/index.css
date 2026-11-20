@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
-/* Klassenfunk: Petrol und Koralle – eigene Farben, damit man es am Beamer sofort von Quizzo unterscheidet */
+/* Klassenfunk: Dunkelgrün und Orange – einheitlich mit der Startseite und den anderen Anwendungen */
 @theme {
-  --color-funk-petrol: #0d3b42;
-  --color-funk-petrol-light: #155a63;
-  --color-funk-petrol-dark: #072429;
-  --color-funk-koralle: #ff7a5c;
-  --color-funk-koralle-dark: #e25a3c;
+  --color-funk-petrol: #0f5c47;
+  --color-funk-petrol-light: #16745a;
+  --color-funk-petrol-dark: #0a3d30;
+  --color-funk-koralle: #ff8a14;
+  --color-funk-koralle-dark: #e06f00;
 }
 
 html,
