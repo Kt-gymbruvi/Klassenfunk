@@ -379,7 +379,7 @@ describe('Info-Folie mit Bild oder YouTube-Video', () => {
     rpcAntworten({ kf_zustand: zustand({ typ: 'info', text: 'Film', inhalt: { text: '', medium: { art: 'youtube', id: 'dQw4w9WgXcQ' } } }) })
     const { container } = zeige('/mitmachen')
     expect(await screen.findByText('Schau nach vorne!')).toBeInTheDocument()
-    expect(container.querySelector('iframe, img')).toBeNull()
+    expect(container.querySelector('iframe, img:not([src$="logo-symbol.png"])')).toBeNull()
   })
 })
 

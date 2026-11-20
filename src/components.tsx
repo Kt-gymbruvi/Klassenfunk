@@ -3,15 +3,32 @@ import { Link } from 'react-router-dom'
 import { useAuth } from './lib/auth.tsx'
 import { supabase } from './lib/supabase.ts'
 
+const LOGO = `${import.meta.env.BASE_URL}logo.png`
+const LOGO_SYMBOL = `${import.meta.env.BASE_URL}logo-symbol.png`
+
+/** Großes Logo (Startseite, auf weißer Plakette, damit das Dunkelgrün lesbar bleibt) bzw. Zeichen mit Schriftzug (Kopfzeilen). */
 export function Logo({ gross = false }: { gross?: boolean }) {
+  if (gross) {
+    return (
+      <h1 className="rounded-[2rem] bg-white p-3 shadow-[0_8px_0_rgba(0,0,0,0.25)] sm:p-4">
+        <img src={LOGO} alt="Klassenfunk" className="h-56 w-auto rounded-3xl sm:h-72 lg:h-96" />
+      </h1>
+    )
+  }
   return (
-    <h1
-      className={`font-black tracking-tight text-funk-koralle drop-shadow-[0_4px_0_rgba(0,0,0,0.35)] ${
-        gross ? 'text-[clamp(2.75rem,14vw,8rem)] leading-tight' : 'text-4xl'
-      }`}
-    >
-      Klassenfunk
+    <h1 className="flex items-center gap-3">
+      <Marke />
     </h1>
+  )
+}
+
+/** Zeichen auf weißer Kachel mit Schriftzug „Klassenfunk“ in Koralle, für Kopfzeilen. */
+export function Marke({ klein = false }: { klein?: boolean }) {
+  return (
+    <>
+      <img src={LOGO_SYMBOL} alt="" className={`shrink-0 rounded-xl bg-white ${klein ? 'h-9 w-9' : 'h-12 w-12'}`} />
+      <span className={`font-black tracking-tight text-funk-koralle ${klein ? 'text-2xl' : 'text-4xl'}`}>Klassenfunk</span>
+    </>
   )
 }
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Knopf, Logo, Meldung, ZurHomepage, ZurueckLink } from '../components.tsx'
+import { Knopf, Logo, Marke, Meldung, ZurHomepage, ZurueckLink } from '../components.tsx'
 import { Einpassen } from '../einpassen.tsx'
 import {
   REAKTIONEN,
@@ -208,7 +208,7 @@ function Sitzung({ t, verlassen }: { t: Teilnahme; verlassen: () => void }) {
       <header className="flex shrink-0 items-center justify-between gap-3">
         <div className="flex shrink-0 items-center gap-2">
           <ZurHomepage />
-          <span className="text-2xl font-black text-funk-koralle">Klassenfunk</span>
+          <span className="flex items-center gap-2"><Marke klein /></span>
         </div>
         <span className="truncate text-base text-white/60">{z?.titel}</span>
       </header>

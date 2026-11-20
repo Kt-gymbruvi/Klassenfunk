@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import QRCode from 'qrcode'
-import { Knopf, Meldung, ZurHomepage } from '../../components.tsx'
+import { Knopf, Marke, Meldung, ZurHomepage } from '../../components.tsx'
 import { Einpassen } from '../../einpassen.tsx'
 import { Ergebnis } from '../../ansicht/Ergebnis.tsx'
 import {
@@ -121,7 +121,7 @@ export default function Praesentieren() {
       <header className="flex shrink-0 flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-4">
           <ZurHomepage />
-          <span className="text-3xl font-black text-funk-koralle">Klassenfunk</span>
+          <span className="flex items-center gap-2"><Marke /></span>
           <span className="text-xl text-white/70">{e.titel}</span>
         </div>
         <div className="flex flex-wrap items-center gap-3 text-xl">

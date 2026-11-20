@@ -34,3 +34,6 @@ supabase/             EINRICHTUNG.md, migrations/kf_001_klassenfunk.sql, kf_002_
 ## Nächste Schritte (priorisiert)
 1. Probelauf im Unterricht: iPad am Beamer, 2–3 Handys, alle Folientypen, Reaktionen, Barometer, Bild/YouTube.
 2. Ideen aus `FAHRPLAN.md` (nicht begonnen): Bilder auch auf Abstimmungsfolien, Quiz-Folie mit richtiger Antwort, Ergebnisse als PDF/Bild exportieren, Präsentation per Link teilen.
+
+## Logo
+Klassenfunk-Logo eingebaut (`public/logo.png`, `public/logo-symbol.png`, auch Favicon): groß auf weißer Plakette (Dunkelgrün wäre auf Petrol unlesbar), als Zeichen mit Schriftzug (`Marke`) in den Kopfzeilen. Noch nicht veröffentlicht.
