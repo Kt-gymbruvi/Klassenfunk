@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import type { Antwort, KlassenFrage } from '../lib/daten.ts'
 import type { Folie } from '../lib/folien.ts'
+import { Wortwolke } from '../wortwolke.tsx'
 
 // Live-Ergebnisse am Beamer – je Folientyp. Ausgeblendete Antworten zählen nicht.
 
@@ -71,24 +72,17 @@ export function Ergebnis({
     case 'wortwolke': {
       const g = gruppiereWoerter(sichtbar)
       if (!g.length) return <Leer>☁ Die Wörter erscheinen hier, sobald sie eintreffen.</Leer>
-      const max = g[0].anzahl
+      // Die Frage steht in der Mitte, die Wörter schweben darum herum (Schlüssel = Wort, zum Ausblenden)
+      const woerter = g.map((w) => ({ schluessel: w.text, text: w.text, anzahl: w.anzahl }))
       return (
         <div className="flex flex-col gap-3">
-          <ul className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 rounded-3xl bg-white/5 px-8 py-8" aria-label="Wortwolke">
-            {g.slice(0, 60).map((w, i) => (
-              <li key={w.text}>
-                <button
-                  type="button"
-                  onClick={() => ausblenden(w.ids)}
-                  title="Antippen zum Ausblenden"
-                  className={`font-black leading-none transition hover:line-through ${TEXTFARBEN[i % TEXTFARBEN.length]}`}
-                  style={{ fontSize: `${1.4 + (w.anzahl / max) * 3.8}rem` }}
-                >
-                  {w.text}
-                </button>
-              </li>
-            ))}
-          </ul>
+          <Wortwolke
+            frage={folie.text}
+            woerter={woerter}
+            waehle={(s) => ausblenden(g.find((w) => w.text === s)?.ids ?? [])}
+            farben={TEXTFARBEN}
+            frageKlasse="bg-white text-funk-petrol-dark"
+          />
           <p className="text-center text-lg text-white/50">Antippen blendet ein Wort aus.</p>
         </div>
       )

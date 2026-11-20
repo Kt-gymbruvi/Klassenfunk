@@ -17,6 +17,9 @@ import {
   type Ergebnisse,
 } from '../../lib/daten.ts'
 import { FOLIENTYPEN } from '../../lib/folien.ts'
+import { TonSchalter, useBeiAenderung, useSchleife } from '../../klang/hooks.tsx'
+import { spieleEffekt } from '../../klang/motor.ts'
+import { ABSTIMMUNG_AUF, ABSTIMMUNG_ZU, FOLIE, LOUNGE, neueAntwort } from '../../klang/lounge.ts'
 import { fehlerText } from '../../lib/supabase.ts'
 
 // Beamer (iPad quer): Folie mit Live-Ergebnissen, Steuerung unten, Reaktionen und Tempo-Barometer.
@@ -59,6 +62,13 @@ export default function Praesentieren() {
     },
   })
   useRegelmaessig(laden, 1500)
+
+  // Ton am Beamer: Lounge-Musik solange gewartet oder abgestimmt wird (nicht auf Info-Folien – dort läuft evtl. ein Video)
+  const lounge = e ? qrGross || (e.folie.typ !== 'info' && e.abstimmung_offen) : false
+  useSchleife(lounge ? LOUNGE : null)
+  useBeiAenderung(e?.folie_nr, () => spieleEffekt(FOLIE))
+  useBeiAenderung(e?.abstimmung_offen, (_alt, neu) => spieleEffekt(neu ? ABSTIMMUNG_AUF : ABSTIMMUNG_ZU))
+  useBeiAenderung(e?.antworten.length, (alt, neu) => neu > alt && spieleEffekt(neueAntwort(neu)))
   // Barometer-Anzeige veraltet von selbst
   useRegelmaessig(() => setTick((t) => t + 1), 10_000)
 
@@ -101,6 +111,8 @@ export default function Praesentieren() {
 
   const folie = e.folie
   const mitAbstimmung = folie.typ !== 'info'
+  // Sobald Wörter da sind, steht die Frage in der Mitte der Wortwolke statt als Überschrift darüber
+  const wolkeMitFrage = folie.typ === 'wortwolke' && e.ergebnisse_sichtbar && e.antworten.some((a) => !a.versteckt && String(a.antwort ?? '').trim() !== '')
   const jetzt = Date.now()
   const aktuell = [...barometer.current.values()].filter((b) => jetzt - b.zeit < BAROMETER_MS)
 
@@ -118,6 +130,7 @@ export default function Praesentieren() {
           </button>
           <span className="text-white/75">👥 {e.teilnehmer}</span>
           <BarometerAnzeige werte={aktuell} />
+          <TonSchalter />
           <Knopf art="leise" className="!py-2 !text-lg" onClick={beenden}>
             Beenden
           </Knopf>
@@ -141,7 +154,10 @@ export default function Praesentieren() {
                 </span>
               )}
             </div>
-            <h2 className="rounded-3xl bg-white px-8 py-6 text-center text-5xl leading-tight font-extrabold text-funk-petrol-dark">{folie.text}</h2>
+            {/* Bei der Wortwolke steht die Frage in der Mitte der Wolke */}
+            {!wolkeMitFrage && (
+              <h2 className="rounded-3xl bg-white px-8 py-6 text-center text-5xl leading-tight font-extrabold text-funk-petrol-dark">{folie.text}</h2>
+            )}
             {mitAbstimmung && !e.ergebnisse_sichtbar ? (
               <p className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
                 <span className="text-6xl">🙈</span>

@@ -28,3 +28,7 @@ Neue Entscheidungen oben anfügen: Datum, Entscheidung, Grund, verworfene Altern
 - Stack und Hosting wie Quizzo (Vite/React/TS/Tailwind, GitHub Pages per Actions, HashRouter), damit dieselben Werkzeuge und Tests funktionieren.
 - Handy fragt den Zustand alle 2 s ab und reagiert zusätzlich auf „aktualisieren“-Broadcasts der Lehrkraft; Polling bleibt als Rückfallebene, falls Realtime ausfällt.
 - Kein Scrollen in der Sitzung: `<Einpassen>` verkleinert gleichmäßig; Medien liegen absolut positioniert in einem `flex-1`-Bereich, damit ihre Bildgröße nicht die ganze Folie verkleinert.
+
+## Wortwolke und Ton
+- **Wortwolke:** Die Frage steht in der Mitte, die Wörter schweben darum herum und bleiben leicht in Bewegung (`src/wortwolke.tsx`, identisch zu Quizzo; Layout rein rechnerisch, Animation per CSS, aus bei „Bewegung reduzieren“). Solange noch keine Wörter da sind, bleibt die Frage als Überschrift stehen.
+- **Ton nur am Beamer:** Lounge-Schleife (E-Piano, Swing, Besen – `src/klang/lounge.ts`) läuft in der Wartephase und solange abgestimmt wird, nicht auf Info-Folien (dort kann ein Video laufen). Dezente Effekte: Glöckchen bei neuer Antwort, Folienwechsel, Abstimmung auf/zu. Erzeugt mit der Web-Audio-API (`src/klang/motor.ts`, gleiche Datei wie in Quizzo), keine Audiodateien. 🔊/🔇-Schalter, Wahl im localStorage.

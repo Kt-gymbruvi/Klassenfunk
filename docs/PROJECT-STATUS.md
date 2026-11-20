@@ -11,6 +11,10 @@ Tests: 2 Testdateien, 32 Tests grün (`npm test`); Build grün. SQL `kf_001` und
 - **Handy:** Beitritt nur mit PIN (Teilnahme 6 h im localStorage), Antworten ändern, Reaktionen (Emojis) und Tempo-/Verständnis-Barometer über Realtime-Broadcast (nicht gespeichert). Medien werden auf dem Handy nicht gezeigt.
 - **Medien:** Bilder im Bucket `klassenfunk-medien` (auf 1920 px verkleinert, WebP), unbenutzte Bilder > 24 h löscht `raeumeBilderAuf()`.
 
+## Lokal, noch nicht veröffentlicht
+- **Wortwolke neu:** Frage in der Mitte, Wörter schweben darum und bleiben in Bewegung (`src/wortwolke.tsx`).
+- **Ton am Beamer:** Lounge-Musik + dezente Effekte (`src/klang/`), 🔊/🔇-Schalter. Nur per Test geprüft, **Klang noch nicht gehört**.
+
 ## Struktur
 ```
 src/App.tsx, main.tsx, components.tsx, einpassen.tsx, index.css
