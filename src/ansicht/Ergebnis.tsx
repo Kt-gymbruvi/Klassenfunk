@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import type { Antwort, KlassenFrage } from '../lib/daten.ts'
 import type { Folie } from '../lib/folien.ts'
 import { Wortwolke } from '../wortwolke.tsx'
@@ -188,33 +188,52 @@ export function Ergebnis({
         return p.length ? [p.reduce((s, q) => s + q[0], 0) / p.length, p.reduce((s, q) => s + q[1], 0) / p.length] : null
       })
       const pos = (x: number, y: number) => ({ left: `${x * 10}%`, top: `${100 - y * 10}%` })
+      // Das Raster ist immer ein Quadrat (nie gestaucht) und so groß, wie der freie Platz es zulässt:
+      // Seitenlänge = kleinere Seite des Platzes minus Achsenbeschriftung (2,5 rem) und Abstand (0,5 rem).
+      const seite = 'min(100cqw - 3rem, 100cqh - 3rem)'
       return (
-        <div className="flex flex-1 items-stretch gap-6">
-          <div className="flex flex-col justify-between py-2 text-right text-xl text-white/70">
-            <span>{folie.inhalt.y[1]} ↑</span>
-            <span>{folie.inhalt.y[0]}</span>
-          </div>
-          <div className="flex flex-1 flex-col gap-2">
-            <div className="relative min-h-72 w-full flex-1 rounded-3xl bg-white/5 ring-2 ring-white/20" aria-label="2×2-Raster">
-              <div className="absolute inset-y-0 left-1/2 w-px bg-white/20" />
-              <div className="absolute inset-x-0 top-1/2 h-px bg-white/20" />
-              {punkte.flatMap((p, k) =>
-                p.map((q, i) => <span key={`${k}-${i}`} className={`absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-50 ${FARBEN[i % FARBEN.length]}`} style={pos(q[0], q[1])} />),
-              )}
-              {mittel.map((m, i) =>
-                m ? (
-                  <span key={i} className="absolute flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 transition-all duration-500" style={pos(m[0], m[1])}>
-                    <span className={`h-8 w-8 rounded-full border-4 border-white ${FARBEN[i % FARBEN.length]}`} />
-                    <span className="rounded-xl bg-funk-petrol-dark/80 px-2 py-0.5 text-2xl font-extrabold whitespace-nowrap">{folie.inhalt.elemente[i]}</span>
-                  </span>
-                ) : null,
-              )}
+        <div className="flex min-h-0 flex-1 items-stretch gap-8">
+          <div className="relative min-h-80 min-w-0 flex-1 [container-type:size]">
+            <div
+              className="absolute top-1/2 left-1/2 grid -translate-x-1/2 -translate-y-1/2 grid-cols-[2.5rem_var(--seite)] grid-rows-[var(--seite)_2.5rem] gap-2"
+              style={{ '--seite': seite } as CSSProperties}
+            >
+              <div className="flex rotate-180 items-stretch justify-between text-xl text-white/70 [writing-mode:vertical-rl]">
+                <span className="truncate">{folie.inhalt.y[0]}</span>
+                <span className="truncate">↑ {folie.inhalt.y[1]}</span>
+              </div>
+              <div className="relative rounded-3xl bg-white/5 ring-2 ring-white/20" aria-label="2×2-Raster">
+                <div className="absolute inset-y-0 left-1/2 w-px bg-white/20" />
+                <div className="absolute inset-x-0 top-1/2 h-px bg-white/20" />
+                {punkte.flatMap((p, k) =>
+                  p.map((q, i) => <span key={`${k}-${i}`} className={`absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-50 ${FARBEN[i % FARBEN.length]}`} style={pos(q[0], q[1])} />),
+                )}
+                {mittel.map((m, i) =>
+                  m ? (
+                    <span
+                      key={i}
+                      className={`absolute flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-4 border-white text-2xl font-black text-funk-petrol-dark transition-all duration-500 ${FARBEN[i % FARBEN.length]}`}
+                      style={pos(m[0], m[1])}
+                    >
+                      {i + 1}
+                    </span>
+                  ) : null,
+                )}
+              </div>
+              <div className="col-start-2 flex justify-between gap-4 text-xl text-white/70">
+                <span className="truncate">{folie.inhalt.x[0]}</span>
+                <span className="truncate">{folie.inhalt.x[1]} →</span>
+              </div>
             </div>
-            <div className="flex justify-between text-xl text-white/70">
-              <span>{folie.inhalt.x[0]}</span>
-              <span>{folie.inhalt.x[1]} →</span>
-            </div>
           </div>
+          <ol className="flex w-[22rem] shrink-0 flex-col justify-center gap-4" aria-label="Legende">
+            {folie.inhalt.elemente.map((e, i) => (
+              <li key={i} className={`flex items-center gap-4 ${mittel[i] ? '' : 'opacity-40'}`}>
+                <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-4 border-white text-2xl font-black text-funk-petrol-dark ${FARBEN[i % FARBEN.length]}`}>{i + 1}</span>
+                <span className="text-3xl font-bold break-words">{e}</span>
+              </li>
+            ))}
+          </ol>
         </div>
       )
     }
